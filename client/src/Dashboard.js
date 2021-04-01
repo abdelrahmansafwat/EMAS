@@ -274,52 +274,12 @@ export default function Dashboard() {
 
   const baordDecisionsColumns = [
     { field: "id", headerName: "ID", width: 70, filterable: false },
-    { field: "subject", headerName: "Subject", width: 130 },
-    { field: "department", headerName: "Department", width: 130 },
-    { field: "decision", headerName: "Decision", width: 130 },
-    { field: "date", headerName: "Date", type: "date", width: 130 },
-    { field: "status", headerName: "Status", width: 130 },
-    {
-      field: "viewButton",
-      headerName: "View",
-      width: 130,
-      disableClickEventBubbling: true,
-      filterable: false,
-      sortable: false,
-      renderCell: (params) => {
-        //console.log(params.row.viewButton);
-        var index = params.row.id;
-
-        const onClick = async () => {
-          console.log("Viewing decision #" + index);
-          var decision = boardDecisions[index - 1];
-          /*
-          await axios
-            .get("/api/retrieve_decisions/image/" + decision.image, {
-              responseType: "arraybuffer",
-            })
-            .then(
-              (response) =>
-                (decision.imageBase64 =
-                  "data:;base64," +
-                  Buffer.from(response.data, "binary").toString("base64"))
-            );
-          */
-          setCurrentBoardDecision(decision);
-          setBoardViewDialog(true);
-        };
-
-        return (
-          <Button
-            variant="contained"
-            onClick={() => onClick()}
-            disabled={privilege < 2}
-          >
-            View
-          </Button>
-        );
-      },
-    },
+    { field: "firstName", headerName: "First Name", width: 130 },
+    { field: "lastName", headerName: "Last Name", width: 130 },
+    { field: "nationalId", headerName: "National ID", width: 130 },
+    { field: "job", headerName: "Job", width: 130 },
+    { field: "management", headerName: "Management", width: 130 },
+    { field: "center", headerName: "Center", width: 130 },
     {
       field: "updateButton",
       headerName: "Update",
@@ -370,10 +330,10 @@ export default function Dashboard() {
 
         const onClick = async () => {
           console.log("Viewing decision #" + index);
-          var decision = boardDecisions[index - 1];
-          var alldecisions = boardDecisions;
+          var decision = decisions[index - 1];
+          var alldecisions = decisions;
           axios
-            .post("/api/upload_board_decisions/delete", {
+            .post("/api/upload_employees/delete", {
               _id: decision._id,
             })
             .then(function (response) {
@@ -381,7 +341,7 @@ export default function Dashboard() {
               console.log(alldecisions.length);
               alldecisions.splice(index - 1, 1);
               console.log(alldecisions.length);
-              setBoardDecisions(alldecisions);
+              setDecisions(alldecisions);
               //history.push("/dashboard");
             })
             .catch(function (error) {
@@ -500,13 +460,19 @@ export default function Dashboard() {
     if (privilege > 0) {
       axios.create({ baseURL: window.location.origin });
       await axios
-        .get("/api/retrieve_decisions/all")
+        .get("/api/retrieve_employees/all")
         .then(function (response) {
-          var decisions = response.data.decisions;
+          var decisions = response.data.employees;
           decisions.forEach((value, index) => {
             decisions[index].id = index + 1;
-            decisions[index].date = new Date(
-              decisions[index].date
+            decisions[index].dateOfBirth = new Date(
+              decisions[index].dateOfBirth
+            ).toLocaleDateString();
+            decisions[index].contractStartDate = new Date(
+              decisions[index].contractStartDate
+            ).toLocaleDateString();
+            decisions[index].endServiceDate = new Date(
+              decisions[index].endServiceDate
             ).toLocaleDateString();
 
             decisions[index].updateButton = (
@@ -517,32 +483,6 @@ export default function Dashboard() {
           });
           console.log(decisions);
           setDecisions(decisions);
-        })
-        .catch(function (error) {
-          console.log(error);
-          setAuthError(true);
-          setErrorMessage("An error occured. Please try again.");
-        });
-
-      await axios
-        .post("/api/var/retrieve", { name: "tags" })
-        .then(function (response) {
-          var tags = response.data.vars[0].vars;
-          console.log(tags);
-          setTags(tags);
-        })
-        .catch(function (error) {
-          console.log(error);
-          setAuthError(true);
-          setErrorMessage("An error occured. Please try again.");
-        });
-
-      await axios
-        .post("/api/var/retrieve", { name: "issuers" })
-        .then(function (response) {
-          var issuers = response.data.vars[0].vars;
-          console.log(issuers);
-          setIssuers(issuers);
         })
         .catch(function (error) {
           console.log(error);
@@ -589,7 +529,7 @@ export default function Dashboard() {
     await getAllDecisions();
   };
 
-  //constructor();
+  constructor();
 
   const handleTagsDelete = (chipToDelete) => () => {
     setSelectedTags((chips) => chips.filter((chip) => chip !== chipToDelete));
@@ -724,14 +664,19 @@ export default function Dashboard() {
                 <ListItem
                   button
                   onClick={(event) => {
-                    getAllUsers();
-                    setAdministration(true);
+                    setAdministration(!administration);
+                    if(administration){
+                      getAllUsers();
+                    }
+                    else {
+                      getAllDecisions();
+                    }
                   }}
                 >
                   <ListItemIcon>
                     <SupervisorAccountIcon />
                   </ListItemIcon>
-                  <ListItemText primary="Admin" />
+                  <ListItemText primary={ administration ? "Employees" : "Admin" } />
                 </ListItem>
               )}
 
@@ -765,6 +710,17 @@ export default function Dashboard() {
                 />
               )}
 
+              {ready && !administration && (
+                <DataGrid
+                  rows={decisions}
+                  columns={baordDecisionsColumns}
+                  pageSize={5}
+                  checkboxSelection
+                  showToolbar={true}
+                  filterModel={filterModel}
+                />
+              )}
+
               {ready && administration && (
                 <DataGrid
                   rows={users}
@@ -780,6 +736,206 @@ export default function Dashboard() {
               <Copyright />
             </Box>
           </Container>
+
+          <Dialog
+            open={userDialog}
+            onClose={() => setUserDialog(false)}
+            aria-labelledby="form-dialog-title"
+          >
+            <DialogTitle id="form-dialog-title">Update User</DialogTitle>
+            <DialogContent>
+              <Controller
+                name="firstName"
+                defaultValue={firstName}
+                as={
+                  <TextField
+                    //error={titleError}
+                    value={firstName}
+                    variant="outlined"
+                    margin="normal"
+                    required
+                    fullWidth
+                    id="firstName"
+                    label="First Name"
+                    name="firstName"
+                    autoComplete="firstName"
+                    //helperText={titleError ? "Required" : ""}
+                    onChange={(e) => {
+                      if (e.target.value === "") {
+                        //setTitleError(true);
+                        //setTitle(e.target.value);
+                      } else {
+                        //setTitleError(false);
+                        setFirstName(e.target.value);
+                      }
+                    }}
+                    onBlur={() => {
+                      if (firstName === "") {
+                        //setTitleError(true);
+                      }
+                    }}
+                    autoFocus
+                  />
+                }
+                control={control}
+              />
+
+              <Controller
+                name="lastName"
+                defaultValue={lastName}
+                as={
+                  <TextField
+                    //error={titleError}
+                    value={lastName}
+                    variant="outlined"
+                    margin="normal"
+                    required
+                    fullWidth
+                    id="lastName"
+                    label="Last Name"
+                    name="lastName"
+                    autoComplete="lastName"
+                    //helperText={titleError ? "Required" : ""}
+                    onChange={(e) => {
+                      if (e.target.value === "") {
+                        //setTitleError(true);
+                        //setTitle(e.target.value);
+                      } else {
+                        //setTitleError(false);
+                        setLastName(e.target.value);
+                      }
+                    }}
+                    onBlur={() => {
+                      if (lastName === "") {
+                        //setTitleError(true);
+                      }
+                    }}
+                  />
+                }
+                control={control}
+              />
+
+              <Controller
+                name="email"
+                defaultValue={email}
+                as={
+                  <TextField
+                    //error={titleError}
+                    value={email}
+                    variant="outlined"
+                    margin="normal"
+                    required
+                    fullWidth
+                    id="email"
+                    label="Email"
+                    name="email"
+                    autoComplete="email"
+                    //helperText={titleError ? "Required" : ""}
+                    onChange={(e) => {
+                      if (e.target.value === "") {
+                        //setTitleError(true);
+                        //setTitle(e.target.value);
+                      } else {
+                        //setTitleError(false);
+                        setEmail(e.target.value);
+                      }
+                    }}
+                    onBlur={() => {
+                      if (email === "") {
+                        //setTitleError(true);
+                      }
+                    }}
+                  />
+                }
+                control={control}
+              />
+
+              <FormControl variant="outlined" fullWidth>
+                <InputLabel id="demo-simple-select-outlined-label">
+                  Privilege
+                </InputLabel>
+                <Select
+                  labelId="demo-mutiple-chip-label"
+                  id="demo-mutiple-chip"
+                  value={userPrivilege}
+                  defaultValue={userPrivilege}
+                  disabled={privilege < 2}
+                  onChange={(selected) => {
+                    //var newSelectedTags = tags;
+                    //newSelectedTags.push(selected.target.value);
+                    setUserPrivilege(selected.target.value);
+                  }}
+                  input={<Input id="select-multiple-chip" />}
+                  MenuProps={MenuProps}
+                >
+                  <MenuItem key={"None"} value={"None"}>
+                    <ListItemText primary={"None"} />
+                  </MenuItem>
+                  <MenuItem key={"View"} value={"View"}>
+                    <ListItemText primary={"View"} />
+                  </MenuItem>
+                  <MenuItem key={"View/Update"} value={"View/Update"}>
+                    <ListItemText primary={"View/Update"} />
+                  </MenuItem>
+                  <MenuItem key={"Admin"} value={"Admin"}>
+                    <ListItemText primary={"Admin"} />
+                  </MenuItem>
+                </Select>
+              </FormControl>
+              <DialogActions>
+                <Button
+                  onClick={() => setUserDialog(false)}
+                  variant="contained"
+                >
+                  Cancel
+                </Button>
+                <Button
+                  onClick={() => {
+                    var privilegeLevel = 0;
+                    if (userPrivilege === "Add") {
+                      privilegeLevel = 1;
+                    } else if (userPrivilege === "Add/Update") {
+                      privilegeLevel = 2;
+                    } else if (userPrivilege === "Admin") {
+                      privilegeLevel = 3;
+                    }
+                    axios.create({ baseURL: window.location.origin });
+                    axios
+                      .post("/api/user/update", {
+                        firstName: control.getValues().firstName,
+                        lastName: control.getValues().lastName,
+                        email: control.getValues().email,
+                        privilege: privilegeLevel,
+                        _id: userId,
+                      })
+                      .then(function (response) {
+                        console.log(response);
+                        setUpdateProgress(false);
+                        setUserDialog(false);
+                      })
+                      .catch(function (error) {
+                        console.log(error);
+                        if (error) {
+                          setUpdateProgress(false);
+                          setUserDialog(false);
+                          setErrorMessage(
+                            "An error occured. Please try again."
+                          );
+                          setAuthError(true);
+                        }
+                      });
+                  }}
+                  color="primary"
+                  variant="contained"
+                >
+                  {!updateProgress && "Update"}
+                  {updateProgress && (
+                    <CircularProgress color="secondary" size={20} />
+                  )}
+                </Button>
+              </DialogActions>
+            </DialogContent>
+          </Dialog>
 
           <Dialog
             open={boardDialog}
