@@ -46,13 +46,13 @@ router.post("/new", uploadDisk.array("file"), async (req, res) => {
     gender: req.body.gender,
     status: req.body.status,
     dateOfBirth: req.body.dateOfBirth,
-    qualification: req.body.qualification,
+    qualification: JSON.parse(req.body.qualification),
     job: req.body.job,
     contractStartDate: req.body.contractStartDate,
     endServiceDate: req.body.endServiceDate,
     center: req.body.center,
     management: req.body.management,
-    fileNames: req.body.fileNames,
+    fileNames: req.body.fileNames.split(","),
   });
 
   newEmployee.save((err, data) => {
@@ -91,13 +91,13 @@ router.post("/update", uploadDisk.single("file"), async (req, res) => {
       gender: req.body.gender,
       status: req.body.status,
       dateOfBirth: req.body.dateOfBirth,
-      qualification: req.body.qualification,
+      qualification: JSON.parse(req.body.qualification),
       job: req.body.job,
       contractStartDate: req.body.contractStartDate,
       endServiceDate: req.body.endServiceDate,
       center: req.body.center,
       management: req.body.management,
-      fileNames: req.body.fileNames,
+      fileNames: req.body.fileNames.split(","),
     },
     { new: true },
     (err, data) => {

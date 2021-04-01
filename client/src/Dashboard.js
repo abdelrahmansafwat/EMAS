@@ -951,7 +951,7 @@ export default function Dashboard() {
               {"Add Employee"}
             </DialogTitle>
             <DialogContent>
-              <Add setBoardDialog={setBoardDialog} />
+              <Add setBoardDialog={setBoardDialog} setErrorMessage={setErrorMessage} setAuthError={setAuthError} />
             </DialogContent>
           </Dialog>
 

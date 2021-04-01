@@ -463,6 +463,7 @@ function Add(props) {
                   style={{ display: "none" }}
                   onChange={(event) => {
                     setNationalIdScan(event.target.files[0]);
+                    setNationalIdScanName(event.target.files[0].name);
                   }}
                 />
                 <label htmlFor="contained-button-file">
@@ -508,6 +509,7 @@ function Add(props) {
                   style={{ display: "none" }}
                   onChange={(event) => {
                     setMilitaryStatusScan(event.target.files[0]);
+                    setMilitaryStatusScanName(event.target.files[0].name);
                   }}
                 />
                 <label htmlFor="contained-button-file">
@@ -553,6 +555,7 @@ function Add(props) {
                   style={{ display: "none" }}
                   onChange={(event) => {
                     setInsuranceNumberScan(event.target.files[0]);
+                    setInsuranceNumberScanName(event.target.files[0].name);
                   }}
                 />
                 <label htmlFor="contained-button-file">
@@ -732,6 +735,7 @@ function Add(props) {
                         style={{ display: "none" }}
                         onChange={(event) => {
                           setCertificateScan(event.target.files[0]);
+                          setCertificateScanName(event.target.files[0].name);
                         }}
                       />
                       <label htmlFor="contained-button-file">
@@ -874,6 +878,7 @@ function Add(props) {
                         style={{ display: "none" }}
                         onChange={(event) => {
                           setCertificateScan(event.target.files[0]);
+                          setCertificateScanName(event.target.files[0].name);
                         }}
                       />
                       <label htmlFor="contained-button-file">
@@ -982,6 +987,7 @@ function Add(props) {
                         style={{ display: "none" }}
                         onChange={(event) => {
                           setCertificateScan(event.target.files[0]);
+                          setCertificateScanName(event.target.files[0].name);
                         }}
                       />
                       <label htmlFor="contained-button-file">
@@ -1073,6 +1079,7 @@ function Add(props) {
                         style={{ display: "none" }}
                         onChange={(event) => {
                           setCertificateScan(event.target.files[0]);
+                          setCertificateScanName(event.target.files[0].name);
                         }}
                       />
                       <label htmlFor="contained-button-file">
@@ -1175,10 +1182,12 @@ function Add(props) {
                 "Aswan",
                 "Asyut",
                 "BeniSuef",
+                "Dokki",
                 "Fayoum",
+                "Hurghada",
+                "Ismailia",
                 "Menoufia",
                 "Qena",
-                "Hurghada",
               ]}
               filterOptions={(x) => x}
               getOptionLabel={(option) => option}
@@ -1272,7 +1281,60 @@ function Add(props) {
               component="span"
               fullWidth
               onClick={async (event) => {
-                if (index === 3) {
+                if (index === 2) {
+                  var formData = new FormData();
+                  formData.append("file", [
+                    nationalIdScan,
+                    militaryStatusScan,
+                    insuranceNumberScan,
+                    certificateScan,
+                  ]);
+                  formData.append("email", email);
+                  formData.append("firstName", firstName);
+                  formData.append("lastName", lastName);
+                  formData.append("nationalId", nationalId);
+                  formData.append("phone", phone);
+                  formData.append("address", address);
+                  formData.append("gender", gender);
+                  formData.append("status", status);
+                  formData.append("dateOfBirth", dateOfBirth);
+                  formData.append("job", job);
+                  formData.append("contractStartDate", contractStart);
+                  formData.append("endServiceDate", endOfService);
+                  formData.append("center", center);
+                  formData.append("management", management);
+                  formData.append("fileNames", [
+                    nationalIdScanName,
+                    militaryStatusScanName,
+                    insuranceNumberScanName,
+                    certificateScanName,
+                  ]);
+                  formData.append("qualification", JSON.stringify({
+                    qualification: qualification,
+                    university: university,
+                    college: college,
+                    country: country,
+                    graduation: graduation,
+                    grade: grade,
+                    specialization: specialization,
+                    school: school,
+                    type: type,
+                  }));
+
+                  axios.create({ baseURL: window.location.origin });
+                  axios
+                    .post("/api/upload_employees/new", formData)
+                    .then(function (response) {
+                      props.setBoardDialog(false);
+                    })
+                    .catch(function (error) {
+                      console.log(error);
+                      if (error) {
+                        props.setBoardDialog(false);
+                        props.setErrorMessage("An error occured. Please try again.");
+                        props.setAuthError(true);
+                      }
+                    });
                 } else {
                   setIndex(index + 1);
                 }
