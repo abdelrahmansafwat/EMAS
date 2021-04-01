@@ -43,6 +43,7 @@ import Chip from "@material-ui/core/Chip";
 import Checkbox from "@material-ui/core/Checkbox";
 import history from "./history";
 import Add from "./Add";
+import Update from "./Update";
 import CloseIcon from "@material-ui/icons/Close";
 import GavelIcon from "@material-ui/icons/Gavel";
 import SupervisorAccountIcon from "@material-ui/icons/SupervisorAccount";
@@ -253,6 +254,7 @@ export default function Dashboard() {
     ""
   );
   const [varsDeleteDialog, setVarsDeleteDialog] = useState(false);
+  const [updateBoardDialog, setUpdateBoardDialog] = useState(false);
   const { control } = useForm();
 
   const ITEM_HEIGHT = 48;
@@ -291,18 +293,12 @@ export default function Dashboard() {
         //console.log(params.row.viewButton);
 
         const onClick = async () => {
-          setBoardSubject(params.row.subject);
-          setBoardDecision(params.row.decision);
-          setBoardDepartment(params.row.department);
-          setBoardStatus(params.row.status);
-          setBoardDate(params.row.date);
-          setBoardDecisionId(params.row._id);
-          setAddOrUpdate("Update");
+          setCurrentDecision(params.row);
           //setTitleError(false);
           //setSummaryError(false);
           //setTagsError(false);
           //setIssuedByError(false);
-          setBoardDialog(true);
+          setUpdateBoardDialog(true);
         };
 
         return (
@@ -954,6 +950,24 @@ export default function Dashboard() {
               <Add setBoardDialog={setBoardDialog} setErrorMessage={setErrorMessage} setAuthError={setAuthError} />
             </DialogContent>
           </Dialog>
+
+          {updateBoardDialog && <Dialog
+            open={updateBoardDialog}
+            TransitionComponent={Transition}
+            keepMounted
+            fullWidth
+            maxWidth="md"
+            onClose={() => setUpdateBoardDialog(false)}
+            aria-labelledby="alert-dialog-slide-title"
+            aria-describedby="alert-dialog-slide-description"
+          >
+            <DialogTitle id="alert-dialog-slide-title">
+              {"Update Employee"}
+            </DialogTitle>
+            <DialogContent>
+              <Update setBoardDialog={setUpdateBoardDialog} setErrorMessage={setErrorMessage} setAuthError={setAuthError} employee={currentDecision} />
+            </DialogContent>
+          </Dialog> }
 
           <Dialog
             open={authError}
