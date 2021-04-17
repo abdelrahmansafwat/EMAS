@@ -38,7 +38,7 @@ import {
   PermIdentity,
 } from "@material-ui/icons";
 import DateFnsUtils from "@date-io/date-fns";
-import { useForm, Controller } from "react-hook-form";
+//import { useForm, Controller } from "react-hook-form";
 import axios from "axios";
 import dayjs from "dayjs";
 
@@ -163,7 +163,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-function Add(props) {
+function Update(props) {
   const classes = useStyles();
 
   const [index, setIndex] = useState(0);
@@ -198,6 +198,15 @@ function Add(props) {
   const [job, setJob] = useState(props.employee.qualification.job);
   const [center, setCenter] = useState(props.employee.center);
   const [management, setManagement] = useState(props.employee.management);
+  const [salaryRange, setSalaryRange] = useState(props.employee.salaryRange);
+  const [faculty, setFaculty] = useState(props.employee.faculty);
+  const [careerLadder, setCareerLadder] = useState(props.employee.careerLadder);
+  const [training, setTraining] = useState(props.employee.training);
+  const [trainingAuthority, setTrainingAuthority] = useState(props.employee.trainingAuthority);
+  const [trainingEnd, setTrainingEnd] = useState(props.employee.trainingEnd);
+  const [trainingStart, setTrainingStart] = useState(props.employee.trainingStart);
+  const [trainingScan, setTrainingScan] = useState("");
+  const [trainingScanName, setTrainingScanName] = useState(props.employee.trainingScanName);
   const [confirm, setConfirm] = useState(false);
   const [message, setMessage] = useState("");
   const [messageDialog, setMessageDialog] = useState(false);
@@ -402,7 +411,7 @@ function Add(props) {
                   margin="normal"
                   fullWidth
                   id="status"
-                  label="Status"
+                  label="Marital Status"
                   name="status"
                 />
               )}
@@ -648,19 +657,29 @@ function Add(props) {
                 </Grid>
 
                 <Grid item>
-                  <TextField
-                    //variant="outlined"
-                    classes={{ root: classes.textField }}
-                    margin="normal"
+                  <Autocomplete
+                    id="combo-box-demo"
                     fullWidth
-                    id="country"
-                    label="Country"
-                    name="country"
-                    //placeholder="From where?"
+                    disableClearable
+                    options={countryList}
+                    filterOptions={(x) => x}
+                    getOptionLabel={(option) => option}
                     value={country}
                     onChange={(value) => {
                       setCountry(value.target.value);
                     }}
+                    renderInput={(params) => (
+                      <TextField
+                        //variant="outlined"
+                        classes={{ root: classes.textField }}
+                        margin="normal"
+                        fullWidth
+                        id="country"
+                        label="Country"
+                        name="country"
+                        //placeholder="From where?"
+                      />
+                    )}
                   />
                 </Grid>
 
@@ -1241,11 +1260,214 @@ function Add(props) {
                   margin="normal"
                   fullWidth
                   id="management"
-                  label="Management"
+                  label="Administration"
                   name="management"
                 />
               )}
             />
+          </Grid>
+
+          {management === "Teaching Staff" && (
+            <Grid item>
+              <Autocomplete
+                id="combo-box-demo"
+                fullWidth
+                disableClearable
+                options={[
+                  "Business Administration",
+                  "Computers and Information Technology",
+                  "Educational Studies",
+                ]}
+                filterOptions={(x) => x}
+                getOptionLabel={(option) => option}
+                value={faculty}
+                onChange={(event, newValue) => {
+                  setFaculty(newValue);
+                }}
+                renderInput={(params) => (
+                  <TextField
+                    //variant="outlined"
+                    classes={{ root: classes.textField }}
+                    {...params}
+                    margin="normal"
+                    fullWidth
+                    id="center"
+                    label="Faculty"
+                    name="faculty"
+                  />
+                )}
+              />
+            </Grid>
+          )}
+
+          <Grid item>
+            <TextField
+              //variant="outlined"
+              classes={{ root: classes.textField }}
+              margin="normal"
+              fullWidth
+              id="salaryRange"
+              label="Salary Range"
+              name="salaryRange"
+              //placeholder="From where?"
+              value={salaryRange}
+              onChange={(value) => {
+                setSalaryRange(value.target.value);
+              }}
+            />
+          </Grid>
+
+          {management === "Teaching Staff" && (
+            <Grid item>
+              <TextField
+                //variant="outlined"
+                classes={{ root: classes.textField }}
+                margin="normal"
+                fullWidth
+                id="careerLadder"
+                label="Career Ladder"
+                name="careerLadder"
+                //placeholder="From where?"
+                value={careerLadder}
+                onChange={(value) => {
+                  setCareerLadder(value.target.value);
+                }}
+              />
+            </Grid>
+          )}
+        </Grid>
+      )}
+
+      {index === 2 && (
+        <Grid container direction={"column"}>
+          <Grid item>
+            <TextField
+              //variant="outlined"
+              classes={{ root: classes.textField }}
+              margin="normal"
+              fullWidth
+              id="training"
+              label="Training Program Name"
+              name="training"
+              //placeholder="From where?"
+              value={training}
+              onChange={(value) => {
+                setTraining(value.target.value);
+              }}
+            />
+          </Grid>
+
+          <Grid item>
+            <TextField
+              //variant="outlined"
+              classes={{ root: classes.textField }}
+              margin="normal"
+              fullWidth
+              id="trainingAuthority"
+              label="Training Authority"
+              name="trainingAuthority"
+              //placeholder="From where?"
+              value={trainingAuthority}
+              onChange={(value) => {
+                setTrainingAuthority(value.target.value);
+              }}
+            />
+          </Grid>
+
+          <Grid item>
+            <MuiPickersUtilsProvider utils={DateFnsUtils}>
+              <DatePicker
+                classes={{ root: classes.textField }}
+                fullWidth
+                variant="outlined"
+                margin="normal"
+                id="date"
+                label="Training Start Date"
+                disableFuture
+                autoOk
+                openTo="year"
+                views={["year", "month", "date"]}
+                format="dd/MM/yyyy"
+                value={trainingStart}
+                onChange={(value) => {
+                  setTrainingStart(value);
+                }}
+                KeyboardButtonProps={{
+                  "aria-label": "change date",
+                }}
+              />
+            </MuiPickersUtilsProvider>
+          </Grid>
+
+          <Grid item>
+            <MuiPickersUtilsProvider utils={DateFnsUtils}>
+              <DatePicker
+                classes={{ root: classes.textField }}
+                fullWidth
+                variant="outlined"
+                margin="normal"
+                id="date"
+                label="Training End Date"
+                disableFuture
+                autoOk
+                openTo="year"
+                views={["year", "month", "date"]}
+                format="dd/MM/yyyy"
+                value={trainingEnd}
+                onChange={(value) => {
+                  setTrainingEnd(value);
+                }}
+                KeyboardButtonProps={{
+                  "aria-label": "change date",
+                }}
+              />
+            </MuiPickersUtilsProvider>
+          </Grid>
+
+          <Grid item>
+            <Grid
+              container
+              direction={"row"}
+              spacing={1}
+              className={classes.dflex}
+            >
+              <Grid item xs={9}>
+                <TextField
+                  value={trainingScanName}
+                  variant="outlined"
+                  margin="normal"
+                  required
+                  fullWidth
+                  disabled
+                  id="trainingScan"
+                  label="Training Certificate Scan"
+                  name="trainingScan"
+                />
+              </Grid>
+              <Grid item xs={3}>
+                <input
+                  accept="image/*"
+                  className={classes.input}
+                  id="contained-button-file"
+                  type="file"
+                  style={{ display: "none" }}
+                  onChange={(event) => {
+                    setTrainingScan(event.target.files[0]);
+                    setTrainingScanName(event.target.files[0].name);
+                  }}
+                />
+                <label htmlFor="contained-button-file">
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    component="span"
+                    fullWidth
+                  >
+                    Browse
+                  </Button>
+                </label>
+              </Grid>
+            </Grid>
           </Grid>
         </Grid>
       )}
@@ -1283,11 +1505,13 @@ function Add(props) {
               onClick={async (event) => {
                 if (index === 2) {
                   var formData = new FormData();
+                  
                   formData.append("file", [
                     nationalIdScan,
                     militaryStatusScan,
                     insuranceNumberScan,
                     certificateScan,
+                    trainingScan
                   ]);
                   formData.append("email", email);
                   formData.append("firstName", firstName);
@@ -1303,23 +1527,39 @@ function Add(props) {
                   formData.append("endServiceDate", endOfService);
                   formData.append("center", center);
                   formData.append("management", management);
+                  formData.append("salaryRange", salaryRange);
+                  formData.append("faculty", faculty);
+                  formData.append("careerLadder", careerLadder);
                   formData.append("fileNames", [
                     nationalIdScanName,
                     militaryStatusScanName,
                     insuranceNumberScanName,
                     certificateScanName,
+                    trainingScanName
                   ]);
-                  formData.append("qualification", JSON.stringify({
-                    qualification: qualification,
-                    university: university,
-                    college: college,
-                    country: country,
-                    graduation: graduation,
-                    grade: grade,
-                    specialization: specialization,
-                    school: school,
-                    type: type,
-                  }));
+                  formData.append(
+                    "qualification",
+                    JSON.stringify({
+                      qualification: qualification,
+                      university: university,
+                      college: college,
+                      country: country,
+                      graduation: graduation,
+                      grade: grade,
+                      specialization: specialization,
+                      school: school,
+                      type: type,
+                    })
+                  );
+                  formData.append(
+                    "training",
+                    JSON.stringify({
+                      training: training,
+                      trainingAuthority: trainingAuthority,
+                      trainingEnd: trainingEnd,
+                      trainingStart: trainingStart,
+                    })
+                  );
 
                   axios.create({ baseURL: window.location.origin });
                   axios
@@ -1331,7 +1571,9 @@ function Add(props) {
                       console.log(error);
                       if (error) {
                         props.setBoardDialog(false);
-                        props.setErrorMessage("An error occured. Please try again.");
+                        props.setErrorMessage(
+                          "An error occured. Please try again."
+                        );
                         props.setAuthError(true);
                       }
                     });
@@ -1349,4 +1591,256 @@ function Add(props) {
   );
 }
 
-export default Add;
+const countryList = [
+  "Afghanistan",
+  "Åland Islands",
+  "Albania",
+  "Algeria",
+  "American Samoa",
+  "Andorra",
+  "Angola",
+  "Anguilla",
+  "Antarctica",
+  "Antigua and Barbuda",
+  "Argentina",
+  "Armenia",
+  "Aruba",
+  "Australia",
+  "Austria",
+  "Azerbaijan",
+  "Bahamas (the)",
+  "Bahrain",
+  "Bangladesh",
+  "Barbados",
+  "Belarus",
+  "Belgium",
+  "Belize",
+  "Benin",
+  "Bermuda",
+  "Bhutan",
+  "Bolivia (Plurinational State of)",
+  "Bonaire, Sint Eustatius and Saba",
+  "Bosnia and Herzegovina",
+  "Botswana",
+  "Bouvet Island",
+  "Brazil",
+  "British Indian Ocean Territory (the)",
+  "Brunei Darussalam",
+  "Bulgaria",
+  "Burkina Faso",
+  "Burundi",
+  "Cabo Verde",
+  "Cambodia",
+  "Cameroon",
+  "Canada",
+  "Cayman Islands (the)",
+  "Central African Republic (the)",
+  "Chad",
+  "Chile",
+  "China",
+  "Christmas Island",
+  "Cocos (Keeling) Islands (the)",
+  "Colombia",
+  "Comoros (the)",
+  "Congo (the Democratic Republic of the)",
+  "Congo (the)",
+  "Cook Islands (the)",
+  "Costa Rica",
+  "Croatia",
+  "Cuba",
+  "Curaçao",
+  "Cyprus",
+  "Czechia",
+  "Côte d'Ivoire",
+  "Denmark",
+  "Djibouti",
+  "Dominica",
+  "Dominican Republic (the)",
+  "Ecuador",
+  "Egypt",
+  "El Salvador",
+  "Equatorial Guinea",
+  "Eritrea",
+  "Estonia",
+  "Eswatini",
+  "Ethiopia",
+  "Falkland Islands (the) [Malvinas]",
+  "Faroe Islands (the)",
+  "Fiji",
+  "Finland",
+  "France",
+  "French Guiana",
+  "French Polynesia",
+  "French Southern Territories (the)",
+  "Gabon",
+  "Gambia (the)",
+  "Georgia",
+  "Germany",
+  "Ghana",
+  "Gibraltar",
+  "Greece",
+  "Greenland",
+  "Grenada",
+  "Guadeloupe",
+  "Guam",
+  "Guatemala",
+  "Guernsey",
+  "Guinea",
+  "Guinea-Bissau",
+  "Guyana",
+  "Haiti",
+  "Heard Island and McDonald Islands",
+  "Holy See (the)",
+  "Honduras",
+  "Hong Kong",
+  "Hungary",
+  "Iceland",
+  "India",
+  "Indonesia",
+  "Iran (Islamic Republic of)",
+  "Iraq",
+  "Ireland",
+  "Isle of Man",
+  "Israel",
+  "Italy",
+  "Jamaica",
+  "Japan",
+  "Jersey",
+  "Jordan",
+  "Kazakhstan",
+  "Kenya",
+  "Kiribati",
+  "Korea (the Democratic People's Republic of)",
+  "Korea (the Republic of)",
+  "Kuwait",
+  "Kyrgyzstan",
+  "Lao People's Democratic Republic (the)",
+  "Latvia",
+  "Lebanon",
+  "Lesotho",
+  "Liberia",
+  "Libya",
+  "Liechtenstein",
+  "Lithuania",
+  "Luxembourg",
+  "Macao",
+  "Madagascar",
+  "Malawi",
+  "Malaysia",
+  "Maldives",
+  "Mali",
+  "Malta",
+  "Marshall Islands (the)",
+  "Martinique",
+  "Mauritania",
+  "Mauritius",
+  "Mayotte",
+  "Mexico",
+  "Micronesia (Federated States of)",
+  "Moldova (the Republic of)",
+  "Monaco",
+  "Mongolia",
+  "Montenegro",
+  "Montserrat",
+  "Morocco",
+  "Mozambique",
+  "Myanmar",
+  "Namibia",
+  "Nauru",
+  "Nepal",
+  "Netherlands (the)",
+  "New Caledonia",
+  "New Zealand",
+  "Nicaragua",
+  "Niger (the)",
+  "Nigeria",
+  "Niue",
+  "Norfolk Island",
+  "Northern Mariana Islands (the)",
+  "Norway",
+  "Oman",
+  "Pakistan",
+  "Palau",
+  "Palestine, State of",
+  "Panama",
+  "Papua New Guinea",
+  "Paraguay",
+  "Peru",
+  "Philippines (the)",
+  "Pitcairn",
+  "Poland",
+  "Portugal",
+  "Puerto Rico",
+  "Qatar",
+  "Republic of North Macedonia",
+  "Romania",
+  "Russian Federation (the)",
+  "Rwanda",
+  "Réunion",
+  "Saint Barthélemy",
+  "Saint Helena, Ascension and Tristan da Cunha",
+  "Saint Kitts and Nevis",
+  "Saint Lucia",
+  "Saint Martin (French part)",
+  "Saint Pierre and Miquelon",
+  "Saint Vincent and the Grenadines",
+  "Samoa",
+  "San Marino",
+  "Sao Tome and Principe",
+  "Saudi Arabia",
+  "Senegal",
+  "Serbia",
+  "Seychelles",
+  "Sierra Leone",
+  "Singapore",
+  "Sint Maarten (Dutch part)",
+  "Slovakia",
+  "Slovenia",
+  "Solomon Islands",
+  "Somalia",
+  "South Africa",
+  "South Georgia and the South Sandwich Islands",
+  "South Sudan",
+  "Spain",
+  "Sri Lanka",
+  "Sudan (the)",
+  "Suriname",
+  "Svalbard and Jan Mayen",
+  "Sweden",
+  "Switzerland",
+  "Syrian Arab Republic",
+  "Taiwan (Province of China)",
+  "Tajikistan",
+  "Tanzania, United Republic of",
+  "Thailand",
+  "Timor-Leste",
+  "Togo",
+  "Tokelau",
+  "Tonga",
+  "Trinidad and Tobago",
+  "Tunisia",
+  "Turkey",
+  "Turkmenistan",
+  "Turks and Caicos Islands (the)",
+  "Tuvalu",
+  "Uganda",
+  "Ukraine",
+  "United Arab Emirates (the)",
+  "United Kingdom of Great Britain and Northern Ireland (the)",
+  "United States Minor Outlying Islands (the)",
+  "United States of America (the)",
+  "Uruguay",
+  "Uzbekistan",
+  "Vanuatu",
+  "Venezuela (Bolivarian Republic of)",
+  "Viet Nam",
+  "Virgin Islands (British)",
+  "Virgin Islands (U.S.)",
+  "Wallis and Futuna",
+  "Western Sahara",
+  "Yemen",
+  "Zambia",
+  "Zimbabwe",
+];
+
+export default Update;

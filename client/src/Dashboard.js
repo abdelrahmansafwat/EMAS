@@ -23,7 +23,7 @@ import AddCircleIcon from "@material-ui/icons/AddCircle";
 import LocalOfferIcon from "@material-ui/icons/LocalOffer";
 import MeetingRoomIcon from "@material-ui/icons/MeetingRoom";
 import AccountCircleIcon from "@material-ui/icons/AccountCircle";
-import { DataGrid } from "@material-ui/data-grid";
+import DataGrid from "mui-datatables";
 import Dialog from "@material-ui/core/Dialog";
 import DialogActions from "@material-ui/core/DialogActions";
 import DialogContent from "@material-ui/core/DialogContent";
@@ -275,177 +275,270 @@ export default function Dashboard() {
   };
 
   const baordDecisionsColumns = [
-    { field: "id", headerName: "ID", width: 70, filterable: false },
-    { field: "firstName", headerName: "First Name", width: 130 },
-    { field: "lastName", headerName: "Last Name", width: 130 },
-    { field: "nationalId", headerName: "National ID", width: 130 },
-    { field: "job", headerName: "Job", width: 130 },
-    { field: "management", headerName: "Management", width: 130 },
-    { field: "center", headerName: "Center", width: 130 },
     {
-      field: "updateButton",
-      headerName: "Update",
-      width: 130,
-      disableClickEventBubbling: true,
-      sortable: false,
-      filterable: false,
-      renderCell: (params) => {
-        //console.log(params.row.viewButton);
-
-        const onClick = async () => {
-          setCurrentDecision(params.row);
-          //setTitleError(false);
-          //setSummaryError(false);
-          //setTagsError(false);
-          //setIssuedByError(false);
-          setUpdateBoardDialog(true);
-        };
-
-        return (
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={() => onClick()}
-            disabled={privilege < 2}
-          >
-            Update
-          </Button>
-        );
+      name: "id",
+      label: "ID",
+      options: {
+        filter: false,
       },
     },
     {
-      field: "deleteButton",
-      headerName: "Delete",
-      width: 130,
-      disableClickEventBubbling: true,
-      sortable: false,
-      filterable: false,
-      renderCell: (params) => {
-        //console.log(params.row.viewButton);
-        var index = params.row.id;
+      name: "firstName",
+      label: "First Name",
+      options: {
+        filter: false,
+      },
+    },
+    {
+      name: "lastName",
+      label: "Last Name",
+      options: {
+        filter: false,
+      },
+    },
+    {
+      name: "job",
+      label: "Job",
+    },
+    {
+      name: "management",
+      label: "Management",
+    },
+    {
+      name: "center",
+      label: "Center",
+    },
+    {
+      name: "contractStartDate",
+      label: "Contract Start Date",
+    },
+    {
+      name: "endServiceDate",
+      label: "Contract End Date",
+    },
+    {
+      name: "updateButton",
+      label: "Update",
+      options: {
+        sort: false,
+        searchable: false,
+        filter: false,
+        display: privilege > 1,
+        customBodyRenderLite: (dataIndex, rowIndex) => {
+          //console.log(params.row.viewButton);
 
-        const onClick = async () => {
-          console.log("Viewing decision #" + index);
-          var decision = decisions[index - 1];
-          var alldecisions = decisions;
-          axios
-            .post("/api/upload_employees/delete", {
-              _id: decision._id,
-            })
-            .then(function (response) {
-              console.log(response);
-              console.log(alldecisions.length);
-              alldecisions.splice(index - 1, 1);
-              console.log(alldecisions.length);
-              setDecisions(alldecisions);
-              //history.push("/dashboard");
-            })
-            .catch(function (error) {
-              console.log(error);
-              if (error) {
-                setErrorMessage("An error occured. Please try again.");
-                setAuthError(true);
-              }
-            });
-        };
+          const onClick = async () => {
+            setCurrentDecision(decisions[dataIndex]);
+            //setTitleError(false);
+            //setSummaryError(false);
+            //setTagsError(false);
+            //setIssuedByError(false);
+            setUpdateBoardDialog(true);
+          };
 
-        return (
-          <Button
-            variant="contained"
-            color="secondary"
-            onClick={() => onClick()}
-            disabled={privilege < 2}
-          >
-            Delete
-          </Button>
-        );
+          return (
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={() => onClick()}
+              disabled={privilege < 2}
+            >
+              Update
+            </Button>
+          );
+        },
+      },
+    },
+    {
+      name: "deleteButton",
+      label: "Delete",
+      options: {
+        sort: false,
+        searchable: false,
+        filter: false,
+        display: privilege > 1,
+        customBodyRenderLite: (dataIndex, rowIndex) => {
+          //console.log(params.row.viewButton);
+          //var index = params.row.id;
+
+          const onClick = async () => {
+            console.log("Viewing decision #" + dataIndex);
+            var decision = decisions[dataIndex];
+            var alldecisions = decisions;
+            axios
+              .post("/api/upload_employees/delete", {
+                _id: decision._id,
+              })
+              .then(function (response) {
+                console.log(response);
+                console.log(alldecisions.length);
+                alldecisions.splice(dataIndex, 1);
+                console.log(alldecisions.length);
+                setDecisions(alldecisions);
+                //history.push("/dashboard");
+              })
+              .catch(function (error) {
+                console.log(error);
+                if (error) {
+                  setErrorMessage("An error occured. Please try again.");
+                  setAuthError(true);
+                }
+              });
+          };
+
+          return (
+            <Button
+              variant="contained"
+              color="secondary"
+              onClick={() => onClick()}
+              disabled={privilege < 2}
+            >
+              Delete
+            </Button>
+          );
+        },
+      },
+    },
+    {
+      name: "viewButton",
+      label: "View",
+      options: {
+        sort: false,
+        searchable: false,
+        filter: false,
+        customBodyRenderLite: (dataIndex, rowIndex) => {
+          //console.log(params.row.viewButton);
+          //var index = params.row.id;
+          const onClick = async () => {
+            setCurrentDecision(decisions[dataIndex]);
+            //setTitleError(false);
+            //setSummaryError(false);
+            //setTagsError(false);
+            //setIssuedByError(false);
+            setUpdateBoardDialog(true);
+          };
+
+          return (
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={() => onClick()}
+              disabled={privilege < 2}
+            >
+              Update
+            </Button>
+          );
+        },
       },
     },
   ];
 
   const usersColumns = [
-    { field: "id", headerName: "ID", width: 70, filterable: false },
-    { field: "firstName", headerName: "First Name", width: 130 },
-    { field: "lastName", headerName: "Last Name", width: 130 },
-    { field: "privilege", headerName: "Privilege", width: 130 },
     {
-      field: "updateButton",
-      headerName: "Update",
-      width: 130,
-      disableClickEventBubbling: true,
-      sortable: false,
-      filterable: false,
-      renderCell: (params) => {
-        //console.log(params.row.viewButton);
-
-        const onClick = async () => {
-          setUserId(params.row._id);
-          setFirstName(params.row.firstName);
-          setLastName(params.row.lastName);
-          setEmail(params.row.email);
-          setUserPrivilege(params.row.privilege);
-          console.log(params.row._id);
-          setUserDialog(true);
-        };
-
-        return (
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={() => onClick()}
-            disabled={privilege < 2}
-          >
-            Update
-          </Button>
-        );
+      name: "id",
+      label: "ID",
+      options: {
+        filter: false,
       },
     },
     {
-      field: "deleteButton",
-      headerName: "Delete",
-      width: 130,
-      disableClickEventBubbling: true,
-      sortable: false,
-      filterable: false,
-      renderCell: (params) => {
-        //console.log(params.row.viewButton);
-        var index = params.row.id;
+      name: "firstName",
+      label: "First Name",
+      options: {
+        filter: false,
+      },
+    },
+    {
+      name: "lastName",
+      label: "Last Name",
+      options: {
+        filter: false,
+      },
+    },
+    {
+      name: "privilege",
+      label: "Privilege",
+    },
+    {
+      name: "updateButton",
+      label: "Update",
+      options: {
+        sort: false,
+        searchable: false,
+        filter: false,
+        display: privilege > 1,
+        customBodyRenderLite: (dataIndex, rowIndex) => {
+          //console.log(params.row.viewButton);
+          const onClick = async () => {
+            setUserId(users[dataIndex]._id);
+            setFirstName(users[dataIndex].firstName);
+            setLastName(users[dataIndex].lastName);
+            setEmail(users[dataIndex].email);
+            setUserPrivilege(users[dataIndex].privilege);
+            console.log(users[dataIndex]._id);
+            setUserDialog(true);
+          };
 
-        const onClick = async () => {
-          console.log("Viewing decision #" + index);
-          var user = users[index - 1];
-          var allusers = users;
-          axios
-            .post("/api/user/delete", {
-              _id: user._id,
-            })
-            .then(function (response) {
-              console.log(response);
-              console.log(allusers.length);
-              allusers.splice(index - 1, 1);
-              console.log(allusers.length);
-              setUsers(allusers);
-              //history.push("/dashboard");
-            })
-            .catch(function (error) {
-              console.log(error);
-              if (error) {
-                setErrorMessage("An error occured. Please try again.");
-                setAuthError(true);
-              }
-            });
-        };
+          return (
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={() => onClick()}
+              disabled={privilege < 2}
+            >
+              Update
+            </Button>
+          );
+        },
+      },
+    },
+    {
+      name: "deleteButton",
+      label: "Delete",
+      options: {
+        sort: false,
+        searchable: false,
+        filter: false,
+        display: privilege > 1,
+        customBodyRenderLite: (dataIndex, rowIndex) => {
+          //console.log(params.row.viewButton);
 
-        return (
-          <Button
-            variant="contained"
-            color="secondary"
-            onClick={() => onClick()}
-            disabled={privilege < 2}
-          >
-            Delete
-          </Button>
-        );
+          const onClick = async () => {
+            console.log("Viewing decision #" + dataIndex);
+            var user = users[dataIndex];
+            var allusers = users;
+            axios
+              .post("/api/user/delete", {
+                _id: user._id,
+              })
+              .then(function (response) {
+                console.log(response);
+                console.log(allusers.length);
+                allusers.splice(dataIndex, 1);
+                console.log(allusers.length);
+                setUsers(allusers);
+                //history.push("/dashboard");
+              })
+              .catch(function (error) {
+                console.log(error);
+                if (error) {
+                  setErrorMessage("An error occured. Please try again.");
+                  setAuthError(true);
+                }
+              });
+          };
+
+          return (
+            <Button
+              variant="contained"
+              color="secondary"
+              onClick={() => onClick()}
+              disabled={privilege < 2}
+            >
+              Delete
+            </Button>
+          );
+        },
       },
     },
   ];
@@ -458,9 +551,16 @@ export default function Dashboard() {
       await axios
         .get("/api/retrieve_employees/all")
         .then(function (response) {
+          var patt = new RegExp("^999+$");
           var decisions = response.data.employees;
           decisions.forEach((value, index) => {
-            decisions[index].id = index + 1;
+            if (patt.test(decisions.length.toString())) {
+              decisions[index].id = (index + 1)
+                .toString()
+                .padStart((index + 1).toString().length + 1, "0");
+            } else {
+              decisions[index].id = (index + 1).toString().padStart(3, "0");
+            }
             decisions[index].dateOfBirth = new Date(
               decisions[index].dateOfBirth
             ).toLocaleDateString();
@@ -661,10 +761,9 @@ export default function Dashboard() {
                   button
                   onClick={(event) => {
                     setAdministration(!administration);
-                    if(administration){
+                    if (administration) {
                       getAllUsers();
-                    }
-                    else {
+                    } else {
                       getAllDecisions();
                     }
                   }}
@@ -672,7 +771,9 @@ export default function Dashboard() {
                   <ListItemIcon>
                     <SupervisorAccountIcon />
                   </ListItemIcon>
-                  <ListItemText primary={ administration ? "Employees" : "Admin" } />
+                  <ListItemText
+                    primary={administration ? "Employees" : "Admin"}
+                  />
                 </ListItem>
               )}
 
@@ -708,23 +809,114 @@ export default function Dashboard() {
 
               {ready && !administration && (
                 <DataGrid
-                  rows={decisions}
+                  title={"Employees"}
+                  data={decisions}
                   columns={baordDecisionsColumns}
-                  pageSize={5}
-                  checkboxSelection
-                  showToolbar={true}
-                  filterModel={filterModel}
+                  options={{
+                    selectableRows: privilege > 1 ? "multiple" : "none",
+                    selectableRowsHeader: privilege > 1,
+                    onCellClick: (rowData, cellMeta) => {
+                      if (cellMeta.colIndex <= 4) {
+                        console.log(cellMeta.rowIndex);
+                        console.log(cellMeta.dataIndex);
+                        console.log(rowData);
+                        console.log(decisions[cellMeta.dataIndex]);
+                        setCurrentDecision(decisions[cellMeta.dataIndex]);
+                        //setTitleError(false);
+                        //setSummaryError(false);
+                        //setTagsError(false);
+                        //setIssuedByError(false);
+                        //setUpdateBoardDialog(true);
+                        //setDecisionViewDialog(true);
+                      }
+                    },
+                    onRowsDelete: (rowsDeleted, data, newTableData) => {
+                      console.log(rowsDeleted);
+                      rowsDeleted.data.map(async (data) => {
+                        console.log("Viewing decision #" + data.dataIndex);
+                        var decision = decisions[data.dataIndex];
+                        var alldecisions = decisions;
+
+                        axios
+                          .post("/api/upload_employees/delete", {
+                            _id: decision._id,
+                          })
+                          .then(function (response) {
+                            console.log(response);
+                            console.log(alldecisions.length);
+                            alldecisions.splice(data.dataIndex, 1);
+                            console.log(alldecisions.length);
+                            setDecisions(alldecisions);
+                            //history.push("/dashboard");
+                          })
+                          .catch(function (error) {
+                            console.log(error);
+                            if (error) {
+                              setErrorMessage(
+                                "An error occured. Please try again."
+                              );
+                              setAuthError(true);
+                            }
+                          });
+                      });
+                    },
+                  }}
                 />
               )}
 
               {ready && administration && (
                 <DataGrid
-                  rows={users}
+                  title={"Users"}
+                  data={users}
                   columns={usersColumns}
-                  pageSize={5}
-                  checkboxSelection
-                  showToolbar={true}
-                  filterModel={filterModel}
+                  options={{
+                    selectableRows: privilege > 1 ? "multiple" : "none",
+                    selectableRowsHeader: privilege > 1,
+                    onCellClick: (rowData, cellMeta) => {
+                      if (cellMeta.colIndex <= 4) {
+                        console.log(cellMeta.rowIndex);
+                        console.log(cellMeta.dataIndex);
+                        console.log(rowData);
+                        console.log(decisions[cellMeta.dataIndex]);
+                        setCurrentDecision(decisions[cellMeta.dataIndex]);
+                        //setTitleError(false);
+                        //setSummaryError(false);
+                        //setTagsError(false);
+                        //setIssuedByError(false);
+                        //setUpdateBoardDialog(true);
+                        //setDecisionViewDialog(true);
+                      }
+                    },
+                    onRowsDelete: (rowsDeleted, data, newTableData) => {
+                      console.log(rowsDeleted);
+                      rowsDeleted.data.map(async (data) => {
+                        console.log("Viewing decision #" + data.dataIndex);
+                        var user = users[data.dataIndex];
+                        var allusers = users;
+                        axios
+                          .post("/api/user/delete", {
+                            _id: user._id,
+                          })
+                          .then(function (response) {
+                            console.log(response);
+                            console.log(allusers.length);
+                            allusers.splice(data.dataIndex, 1);
+                            console.log(allusers.length);
+                            setUsers(allusers);
+                            //history.push("/dashboard");
+                          })
+                          .catch(function (error) {
+                            console.log(error);
+                            if (error) {
+                              setErrorMessage(
+                                "An error occured. Please try again."
+                              );
+                              setAuthError(true);
+                            }
+                          });
+                      });
+                    },
+                  }}
                 />
               )}
             </Paper>
@@ -947,27 +1139,38 @@ export default function Dashboard() {
               {"Add Employee"}
             </DialogTitle>
             <DialogContent>
-              <Add setBoardDialog={setBoardDialog} setErrorMessage={setErrorMessage} setAuthError={setAuthError} />
+              <Add
+                setBoardDialog={setBoardDialog}
+                setErrorMessage={setErrorMessage}
+                setAuthError={setAuthError}
+              />
             </DialogContent>
           </Dialog>
 
-          {updateBoardDialog && <Dialog
-            open={updateBoardDialog}
-            TransitionComponent={Transition}
-            keepMounted
-            fullWidth
-            maxWidth="md"
-            onClose={() => setUpdateBoardDialog(false)}
-            aria-labelledby="alert-dialog-slide-title"
-            aria-describedby="alert-dialog-slide-description"
-          >
-            <DialogTitle id="alert-dialog-slide-title">
-              {"Update Employee"}
-            </DialogTitle>
-            <DialogContent>
-              <Update setBoardDialog={setUpdateBoardDialog} setErrorMessage={setErrorMessage} setAuthError={setAuthError} employee={currentDecision} />
-            </DialogContent>
-          </Dialog> }
+          {updateBoardDialog && (
+            <Dialog
+              open={updateBoardDialog}
+              TransitionComponent={Transition}
+              keepMounted
+              fullWidth
+              maxWidth="md"
+              onClose={() => setUpdateBoardDialog(false)}
+              aria-labelledby="alert-dialog-slide-title"
+              aria-describedby="alert-dialog-slide-description"
+            >
+              <DialogTitle id="alert-dialog-slide-title">
+                {"Update Employee"}
+              </DialogTitle>
+              <DialogContent>
+                <Update
+                  setBoardDialog={setUpdateBoardDialog}
+                  setErrorMessage={setErrorMessage}
+                  setAuthError={setAuthError}
+                  employee={currentDecision}
+                />
+              </DialogContent>
+            </Dialog>
+          )}
 
           <Dialog
             open={authError}
