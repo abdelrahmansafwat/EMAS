@@ -203,10 +203,15 @@ function Add(props) {
   const [careerLadder, setCareerLadder] = useState("");
   const [training, setTraining] = useState("");
   const [trainingAuthority, setTrainingAuthority] = useState("");
-  const [trainingEnd, setTrainingEnd] = useState("");
-  const [trainingStart, setTrainingStart] = useState("");
+  const [trainingEnd, setTrainingEnd] = useState(new Date());
+  const [trainingStart, setTrainingStart] = useState(new Date());
   const [trainingScan, setTrainingScan] = useState("");
   const [trainingScanName, setTrainingScanName] = useState("");
+  const [assignSecondScanName, setAssignSecondScanName] = useState("");
+  const [assignSecondScan, setAssignSecondScan] = useState("");
+  const [employmentStatus, setEmploymentStatus] = useState("");
+  const [assignSecondDate, setAssignSecondDate] = useState(new Date());
+  const [assignSecondAuthority, setAssignSecondAuthority] = useState("");
   const [confirm, setConfirm] = useState(false);
   const [message, setMessage] = useState("");
   const [messageDialog, setMessageDialog] = useState(false);
@@ -591,12 +596,12 @@ function Add(props) {
               fullWidth
               disableClearable
               options={[
-                "Bachelor",
-                "Diplomat",
                 "Illiterate",
-                "PhD",
-                "Master",
                 "Preparatory",
+                "Diplomat",
+                "Bachelor",
+                "Master",
+                "PhD",
               ]}
               filterOptions={(x) => x}
               getOptionLabel={(option) => option}
@@ -1123,6 +1128,33 @@ function Add(props) {
       {index === 2 && (
         <Grid container direction={"column"}>
           <Grid item>
+            <Autocomplete
+              id="combo-box-demo"
+              fullWidth
+              disableClearable
+              options={["Hired", "Assigned", "Seconded"]}
+              filterOptions={(x) => x}
+              getOptionLabel={(option) => option}
+              value={employmentStatus}
+              onChange={(event, newValue) => {
+                setEmploymentStatus(newValue);
+              }}
+              renderInput={(params) => (
+                <TextField
+                  //variant="outlined"
+                  classes={{ root: classes.textField }}
+                  {...params}
+                  margin="normal"
+                  fullWidth
+                  id="employmentStatus"
+                  label="Employment Status"
+                  name="employmentStatus"
+                />
+              )}
+            />
+          </Grid>
+
+          <Grid item>
             <TextField
               //variant="outlined"
               classes={{ root: classes.textField }}
@@ -1335,6 +1367,99 @@ function Add(props) {
               />
             </Grid>
           )}
+
+          {(employmentStatus === "Seconded" ||
+            employmentStatus === "Assigned") && (
+            <React.Fragment>
+              <Grid item>
+                <TextField
+                  //variant="outlined"
+                  classes={{ root: classes.textField }}
+                  margin="normal"
+                  fullWidth
+                  id="job"
+                  label="Assigning/Seconding Authority"
+                  name="assignSecondAuthority"
+                  //placeholder="From where?"
+                  value={assignSecondAuthority}
+                  onChange={(value) => {
+                    setAssignSecondAuthority(value.target.value);
+                  }}
+                />
+              </Grid>
+
+              <Grid item>
+                <MuiPickersUtilsProvider utils={DateFnsUtils}>
+                  <DatePicker
+                    classes={{ root: classes.textField }}
+                    fullWidth
+                    variant="outlined"
+                    margin="normal"
+                    id="date"
+                    label="Assigning/Seconding Date"
+                    disableFuture
+                    autoOk
+                    openTo="year"
+                    views={["year", "month", "date"]}
+                    format="dd/MM/yyyy"
+                    value={assignSecondDate}
+                    onChange={(value) => {
+                      setAssignSecondDate(value);
+                    }}
+                    KeyboardButtonProps={{
+                      "aria-label": "change date",
+                    }}
+                  />
+                </MuiPickersUtilsProvider>
+              </Grid>
+
+              <Grid item>
+                  <Grid
+                    container
+                    direction={"row"}
+                    spacing={1}
+                    className={classes.dflex}
+                  >
+                    <Grid item xs={9}>
+                      <TextField
+                        value={assignSecondScanName}
+                        variant="outlined"
+                        margin="normal"
+                        required
+                        fullWidth
+                        disabled
+                        id="certificateScan"
+                        label="Assigning/Seconding Letter of Approval"
+                        name="certificateScan"
+                      />
+                    </Grid>
+                    <Grid item xs={3}>
+                      <input
+                        accept="image/*"
+                        className={classes.input}
+                        id="contained-button-file"
+                        type="file"
+                        style={{ display: "none" }}
+                        onChange={(event) => {
+                          setAssignSecondScan(event.target.files[0]);
+                          setAssignSecondScanName(event.target.files[0].name);
+                        }}
+                      />
+                      <label htmlFor="contained-button-file">
+                        <Button
+                          variant="contained"
+                          color="primary"
+                          component="span"
+                          fullWidth
+                        >
+                          Browse
+                        </Button>
+                      </label>
+                    </Grid>
+                  </Grid>
+                </Grid>
+            </React.Fragment>
+          )}
         </Grid>
       )}
 
@@ -1505,13 +1630,14 @@ function Add(props) {
               onClick={async (event) => {
                 if (index === 2) {
                   var formData = new FormData();
-                  
+
                   formData.append("file", [
                     nationalIdScan,
                     militaryStatusScan,
                     insuranceNumberScan,
                     certificateScan,
-                    trainingScan
+                    trainingScan,
+                    assignSecondScan
                   ]);
                   formData.append("email", email);
                   formData.append("firstName", firstName);
@@ -1530,12 +1656,16 @@ function Add(props) {
                   formData.append("salaryRange", salaryRange);
                   formData.append("faculty", faculty);
                   formData.append("careerLadder", careerLadder);
+                  formData.append("employmentStatus", employmentStatus);
+                  formData.append("assignSecondDate", assignSecondDate);
+                  formData.append("assignSecondAuthority", assignSecondAuthority);
                   formData.append("fileNames", [
                     nationalIdScanName,
                     militaryStatusScanName,
                     insuranceNumberScanName,
                     certificateScanName,
-                    trainingScanName
+                    trainingScanName,
+                    assignSecondScanName
                   ]);
                   formData.append(
                     "qualification",

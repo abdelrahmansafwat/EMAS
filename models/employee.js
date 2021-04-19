@@ -22,9 +22,11 @@ let employeeSchema = new Schema({
     center: { type: String, required: true },
     management: { type: String, required: true },
     salaryRange: { type: String, required: true },
-    faculty: { type: String, required: true },
-    careerLadder: { type: String, required: true },
-    management: { type: String, required: true },
+    faculty: { type: String },
+    careerLadder: { type: String },
+    employmentStatus: { type: String, required: true },
+    assignSecondDate: { type: Date },
+    assignSecondAuthority: { type: String },
     fileNames: { type: [String], required: true },
 });
 
